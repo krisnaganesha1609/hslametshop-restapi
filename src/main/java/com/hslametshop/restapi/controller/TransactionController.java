@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,5 +53,15 @@ public class TransactionController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().body(transaction);
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Transaction> checkoutTransaction(@PathVariable("id") UUID id) {
+        Transaction sts = transactionService.updateStatus(id);
+        if (sts == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().body(sts);
     }
 }

@@ -10,6 +10,7 @@ import com.hslametshop.restapi.helper.requests.CheckoutRequest;
 import com.hslametshop.restapi.model.entities.Member;
 import com.hslametshop.restapi.model.entities.Transaction;
 import com.hslametshop.restapi.model.entities.TransactionDetail;
+import com.hslametshop.restapi.model.interfaces.TransactionStatusEnum;
 import com.hslametshop.restapi.model.repositories.ProductRepository;
 import com.hslametshop.restapi.model.repositories.TransactionDetailRepository;
 import com.hslametshop.restapi.model.repositories.TransactionRepository;
@@ -79,5 +80,24 @@ public class TransactionService {
 
     public Transaction findTransactionById(UUID id) {
         return transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+    }
+
+    public Transaction updateStatus(UUID id) {
+        Transaction order = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+
+        switch (order.getStatus()) {
+            case PROSES:
+                order.setStatus(TransactionStatusEnum.DIKIRIM);
+                break;
+            case DIKIRIM:
+                order.setStatus(TransactionStatusEnum.SELESAI);
+                break;
+            case SELESAI:
+                throw new IllegalStateException("Order sudah selesai, tidak bisa diubah lagi");
+            default:
+                throw new IllegalStateException("Status tidak dikenali");
+        }
+
+        return transactionRepository.save(order);
     }
 }
